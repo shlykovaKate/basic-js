@@ -20,13 +20,79 @@ const { NotImplementedError } = require('../extensions/index.js');
  * 
  */
 class VigenereCipheringMachine {
-  encrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  constructor(modification) {
+    this.modification = modification;
   }
-  decrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+
+  get modification() {
+    return this._modification;
+  }
+
+  set modification(value) {
+    if (value === false) {    
+      this._modification = 'reverse';
+      return;
+    }
+    this._modification = 'direct';
+  }
+
+  encrypt(message, key) {
+    if (!message || !key) {
+      throw new Error('Incorrect arguments!');
+    }
+    let encryptedMessage = '';
+    const alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+    const arr = message.toLowerCase().split('');
+    const newKey = key.toLowerCase();
+
+    let keyIndex = 0;
+    arr.forEach((letter) => {      
+      const initialIndex = alphabet.findIndex((char) => letter === char);      
+      const i = alphabet.findIndex((char) => newKey[keyIndex] === char);
+      if (initialIndex >= 0) {
+        keyIndex += 1;
+        if (keyIndex > newKey.length - 1) {
+          keyIndex = 0;
+        }        
+        encryptedMessage += alphabet[initialIndex + i > alphabet.length - 1 ? (initialIndex + i) - (alphabet.length) : initialIndex + i];
+      } else {
+        encryptedMessage += letter;
+      }
+    });
+
+    if (this.modification === 'reverse') {
+      return encryptedMessage.toUpperCase().split('').reverse().join('');
+    }
+    return encryptedMessage.toUpperCase();
+  }
+  decrypt(encryptedMessage, key) {
+    if (!encryptedMessage || !key) {
+      throw new Error('Incorrect arguments!');
+    }
+    let decryptedMessage = '';
+    const alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+    const arr = encryptedMessage.toLowerCase().split('');
+    const newKey = key.toLowerCase();
+
+    let keyIndex = 0;
+    arr.forEach((letter) => {      
+      const initialIndex = alphabet.findIndex((char) => letter === char);      
+      const i = alphabet.findIndex((char) => newKey[keyIndex] === char);
+      if (initialIndex >= 0) {
+        keyIndex += 1;
+        if (keyIndex > newKey.length - 1) {
+          keyIndex = 0;
+        }        
+        decryptedMessage += alphabet[initialIndex >= i ? initialIndex - i : alphabet.length - (i - initialIndex)];
+      } else {
+        decryptedMessage += letter;
+      }
+    });
+
+    if (this.modification === 'reverse') {
+      return decryptedMessage.toUpperCase().split('').reverse().join('');
+    }
+    return decryptedMessage.toUpperCase();
   }
 }
 
